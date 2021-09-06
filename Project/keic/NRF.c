@@ -111,7 +111,7 @@ uint8_t NRF24_Transmit (uint8_t *data, uint8_t *ACK_set)
 				REG[0]=FLUSH_TX;
 				SPI_Transmit(REG,1);		
 				// reset FIFO_STATUS
-				NRF24_reset (FIFO_STATUS);
+				NRF24_reset (FIFO_STATUS); 
 				//SRRF[3]=NRF24L01P_Read_Register(FIFO_STATUS);
 				return 1;
 				}
@@ -146,9 +146,13 @@ void NRF24_Rx_ini(void)
 	NRF24_WriteReg(SETUP_RETR, 0x05);//retransmit 5 time + wait 250 us
 	NRF24_WriteReg(RF_CH, 76);// period 2476 MHz	
 	NRF24_WriteReg(RF_SETUP, 0x02 );//TX_PWR:0dBm, Datarate:1Mbps
-	NRF24_WriteReg(FEATURE, 0x01);
-	NRF24_WriteReg(DYNPD, 0x01);//ennable dynamic payload length data pipe 0
+	NRF24_WriteReg(FEATURE, 0x06);//enable dynamic payload and Ack payload
+	NRF24_WriteReg(DYNPD, 0x3F);//ennable dynamic payload length data pipe 0
 	//NRF24_WriteReg(ACTIVATE,0x73);
+	//power up
+	config = NRF24L01P_Read_Register(CONFIG);
+	config |= 0x02;
+	NRF24_WriteReg (CONFIG, config);
 }
 
 void NRF24_Receive (uint8_t *data,uint8_t size)
